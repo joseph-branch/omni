@@ -16,12 +16,21 @@
 		"dist"
 	],
 	"dependencies": {
-		"ink": "^4.1.0",
+		"@ai-sdk/anthropic": "^1.1.15",
+		"@ai-sdk/openai": "^1.2.1",
+		"classy-ink": "^1.1.0",
+		"figlet": "^1.8.0",
+		"ink": "^5.1.1",
+		"ink-autocomplete": "^0.0.0",
+		"ink-multi-select": "^2.0.0",
+		"ink-text-input": "^6.0.0",
+		"log-update": "^6.1.0",
 		"meow": "^11.0.0",
 		"react": "^18.2.0"
 	},
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^3.0.1",
+		"@types/figlet": "^1.7.0",
 		"@types/react": "^18.0.32",
 		"@vdemedes/prettier-config": "^2.0.1",
 		"ava": "^5.2.0",
@@ -31,6 +40,7 @@
 		"eslint-plugin-react-hooks": "^4.6.0",
 		"ink-testing-library": "^3.0.0",
 		"prettier": "^2.8.7",
+		"tailwindcss": "^4.0.12",
 		"ts-node": "^10.9.1",
 		"typescript": "^5.0.3",
 		"xo": "^0.53.1"
