@@ -1,5 +1,5 @@
 import {useContext} from 'react';
-import {WizardContext, WizardContextType} from '@/components/Wizard/Wizard.js';
+import {WizardContext, WizardContextType} from '../components/Wizard/Wizard.js';
 
 export function useWizard(): WizardContextType {
 	const context = useContext(WizardContext);

@@ -2,13 +2,13 @@ import React, {useEffect} from 'react';
 import {Box, Text} from 'ink';
 import TextInput from 'ink-text-input';
 
-import {useWizard} from '@/hooks/useWizard.js';
-import {useQuery} from '@/contexts/QueryContext.js';
-import {useCommand} from '@/contexts/CommandContext.js';
-import {useModel} from '@/contexts/ModelContext.js';
-import {useMessages} from '@/contexts/MessageContext.js';
-import {useApi} from '@/hooks/useApi.js';
-import {useKeyboardShortcuts} from '@/hooks/useKeyboardShortcuts.js';
+import {useWizard} from '../../../hooks/useWizard.js';
+import {useQuery} from '../../../contexts/QueryContext.js';
+import {useCommand} from '../../../contexts/CommandContext.js';
+import {useModel} from '../../../contexts/ModelContext.js';
+import {useMessages} from '../../../contexts/MessageContext.js';
+import {useApi} from '../../../hooks/useApi.js';
+import {useKeyboardShortcuts} from '../../../hooks/useKeyboardShortcuts.js';
 
 const QueryStep: React.FC = () => {
 	// Use contexts

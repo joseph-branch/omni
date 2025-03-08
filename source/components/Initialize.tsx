@@ -15,7 +15,7 @@ import {
 	updateInitializationState,
 	resetInitializationState,
 	deleteConfig,
-} from '@/utils/config.js';
+} from '../utils/config.js';
 
 type InitializeProps = {
 	onComplete: () => void;

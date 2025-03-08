@@ -2,10 +2,7 @@
 	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
 		"outDir": "dist",
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["source/*"]
-		}
+		"baseUrl": "."
 	},
 	"include": ["source"]
 }

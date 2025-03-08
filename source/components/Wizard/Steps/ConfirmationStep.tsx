@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Text, Box, useInput} from 'ink';
 import BaseStep from './BaseStep.js';
-import {useWizard} from '@/hooks/useWizard.js';
+import {useWizard} from '../../../hooks/useWizard.js';
 
 export interface ConfirmationStepProps {
 	title?: string;

@@ -1,8 +1,8 @@
 import {useState} from 'react';
-import {readConfig} from '@/utils/config.js';
-import {getAIResponse} from '@/agent.js';
-import {useModel} from '@/contexts/ModelContext.js';
-import {Message} from '@/contexts/MessageContext.js';
+import {readConfig} from '../utils/config.js';
+import {getAIResponse} from '../agent.js';
+import {useModel} from '../contexts/ModelContext.js';
+import {Message} from '../contexts/MessageContext.js';
 
 export const useApi = () => {
 	const [isLoading, setIsLoading] = useState(false);

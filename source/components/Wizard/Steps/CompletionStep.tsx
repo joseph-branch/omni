@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, useInput} from 'ink';
 import BaseStep from './BaseStep.js';
-import {useWizard} from '@/hooks/useWizard.js';
+import {useWizard} from '../../../hooks/useWizard.js';
 
 export interface CompletionStepProps {
 	title?: string;

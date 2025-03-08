@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {Text, Box, useInput} from 'ink';
 import BaseStep from './BaseStep.js';
-import {useWizard} from '@/hooks/useWizard.js';
+import {useWizard} from '../../../hooks/useWizard.js';
 import {
 	getAllModels,
 	setDefaultModel,
 	readConfig,
-} from '@/utils/config.js';
+} from '../../../utils/config.js';
 
 export interface ModelSelectionStepProps {
 	nextStepId?: string;

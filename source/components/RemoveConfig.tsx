@@ -5,7 +5,7 @@ import {
 	ConfirmationStep,
 	CompletionStep,
 } from './Wizard/Steps/index.js';
-import {deleteConfig, configExists} from '@/utils/config.js';
+import {deleteConfig, configExists} from '../utils/config.js';
 
 type RemoveConfigProps = {
 	onComplete: () => void;
