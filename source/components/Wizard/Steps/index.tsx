@@ -13,9 +13,6 @@ export type {ModelSelectionStepProps} from './ModelSelectionStep.js';
 export {default as CompletionStep} from './CompletionStep.js';
 export type {CompletionStepProps} from './CompletionStep.js';
 
-export {default as LoopingStep} from './LoopingStep.js';
-export type {LoopingStepProps} from './LoopingStep.js';
-
 export {default as ConfirmationStep} from './ConfirmationStep.js';
 export type {ConfirmationStepProps} from './ConfirmationStep.js';
 

@@ -1,6 +1,6 @@
 import React, {ReactNode} from 'react';
 import {Box, Text} from 'ink';
-import {useWizard} from '../../../hooks/useWizard.js';
+import {useWizard} from '@/hooks/useWizard.js';
 
 export interface BaseStepProps {
 	title: string;

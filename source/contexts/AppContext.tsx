@@ -5,7 +5,7 @@ import React, {
 	useEffect,
 	ReactNode,
 } from 'react';
-import {configExists, readConfig, OmniConfig} from '../utils/config.js';
+import {configExists, readConfig, OmniConfig} from '@/utils/config.js';
 
 interface AppContextType {
 	isInitialized: boolean | null;

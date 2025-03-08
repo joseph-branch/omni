@@ -1,6 +1,6 @@
 import React from 'react';
 import {Box} from 'ink';
-import {Wizard} from './Wizard/index.js';
+import Wizard from './Wizard/Wizard.js';
 import QueryStep from './Wizard/Steps/QueryStep.js';
 
 interface QueryInterfaceProps {

@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {Text, Box, useInput} from 'ink';
 import BaseStep from './BaseStep.js';
-import {useWizard} from '../../../hooks/useWizard.js';
-import {readConfig, updateConfig} from '../../../utils/config.js';
+import {useWizard} from '@/hooks/useWizard.js';
+import {readConfig, updateConfig} from '@/utils/config.js';
 
 export interface ProviderSelectionStepProps {
 	nextStepId?: string;

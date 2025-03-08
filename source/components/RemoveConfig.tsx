@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
-import {Wizard} from './Wizard/index.js';
+import Wizard from './Wizard/Wizard.js';
 import {
 	WelcomeStep,
 	ConfirmationStep,
 	CompletionStep,
 } from './Wizard/Steps/index.js';
-import {deleteConfig, configExists} from '../utils/config.js';
+import {deleteConfig, configExists} from '@/utils/config.js';
 
 type RemoveConfigProps = {
 	onComplete: () => void;

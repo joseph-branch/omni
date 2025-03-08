@@ -6,7 +6,6 @@ import figlet from 'figlet';
 import chalk from 'chalk';
 import App from './app.js';
 import Initialize from './components/Initialize.js';
-import LoopingInitialize from './components/LoopingInitialize.js';
 import RemoveConfig from './components/RemoveConfig.js';
 import QueryInterface from './components/QueryInterface.js';
 import {
@@ -32,7 +31,6 @@ const cli = meow(
 
 	Commands
 	  config       Configure API keys and default model
-	  config:loop  Example of a looping configuration wizard
 	  config:rm    Remove all configuration
 	  config:reset Reset the configuration process
 	  query        Interactive LLM query interface
@@ -46,9 +44,6 @@ const cli = meow(
 
 	  $ omni config
 	  Starts the configuration wizard
-	  
-	  $ omni config:loop
-	  Starts the looping configuration wizard example
 	  
 	  $ omni config:rm
 	  Removes all configuration
@@ -83,16 +78,6 @@ if (command === 'config') {
 			onCancel={() => {
 				console.log('Configuration cancelled. CLI will remain unconfigured.');
 				process.exit(1);
-			}}
-		/>,
-	);
-} else if (command === 'config:loop') {
-	// Example of looping wizard
-	render(
-		<LoopingInitialize
-			onComplete={() => {
-				console.log('Looping configuration example complete!');
-				process.exit(0);
 			}}
 		/>,
 	);

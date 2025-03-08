@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Wizard} from './Wizard/index.js';
+import Wizard from './Wizard/Wizard.js';
 import {
 	WelcomeStep,
 	ApiKeyStep,
@@ -15,7 +15,7 @@ import {
 	updateInitializationState,
 	resetInitializationState,
 	deleteConfig,
-} from '../utils/config.js';
+} from '@/utils/config.js';
 
 type InitializeProps = {
 	onComplete: () => void;

@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {readConfig} from '../utils/config.js';
+import {readConfig} from '@/utils/config.js';
 
 interface ApiOptions {
 	model?: string;

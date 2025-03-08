@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Text, Box, useInput} from 'ink';
 import BaseStep from './BaseStep.js';
-import {useWizard} from '../../../hooks/useWizard.js';
-import {updateProviderApiKey} from '../../../utils/config.js';
+import {useWizard} from '@/hooks/useWizard.js';
+import {updateProviderApiKey} from '@/utils/config.js';
 
 export interface ApiKeyStepProps {
 	provider: string;

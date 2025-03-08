@@ -12,7 +12,7 @@ import {
 	updateModelSystemPrompt,
 	updateProviderDefaultSystemPrompt,
 	getSystemPrompt,
-} from '../utils/config.js';
+} from '@/utils/config.js';
 
 interface ModelInfo {
 	provider: string;
