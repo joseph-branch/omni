@@ -1,6 +1,6 @@
 # Omni CLI
 
-A command-line interface for interacting with AI models. **Currently in early alpha stages.**
+An agentic command-line interface for interacting with different AI models within the same session. **Currently in early alpha stages.**
 
 ## Project Status
 
