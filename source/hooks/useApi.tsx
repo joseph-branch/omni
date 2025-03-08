@@ -1,31 +1,34 @@
 import {useState} from 'react';
 import {readConfig} from '@/utils/config.js';
-
-interface ApiOptions {
-	model?: string;
-	systemPrompt?: string;
-}
+import {getAIResponse} from '@/agent.js';
+import {useModel} from '@/contexts/ModelContext.js';
+import {Message} from '@/contexts/MessageContext.js';
 
 export const useApi = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const {currentModel, currentProvider} = useModel();
 
-	const sendQuery = async (query: string, options: ApiOptions = {}) => {
+	const sendQuery = async (query: string, messages: Message[]) => {
 		setIsLoading(true);
 		setError(null);
 
 		try {
 			const config = readConfig();
-			const model = options.model || config.defaultModel;
+			// Use the currentModel from context instead of config.defaultModel
+			const model = currentModel;
 
-			// Find the provider for the selected model
-			let provider = '';
-			for (const [providerName, providerConfig] of Object.entries(
-				config.providers,
-			)) {
-				if (providerConfig.models?.includes(model)) {
-					provider = providerName;
-					break;
+			// Use currentProvider from context if available, otherwise find it
+			let provider = currentProvider;
+			if (!provider) {
+				// Find the provider for the selected model
+				for (const [providerName, providerConfig] of Object.entries(
+					config.providers,
+				)) {
+					if (providerConfig.models?.includes(model)) {
+						provider = providerName;
+						break;
+					}
 				}
 			}
 
@@ -38,17 +41,9 @@ export const useApi = () => {
 				throw new Error(`No API key found for provider: ${provider}`);
 			}
 
-			// This is a placeholder for the actual API call implementation
-			// In a real implementation, you would make an API call to the provider's API
-			console.log(`Sending query to ${provider} model ${model}`);
-			console.log(`Query: ${query}`);
-			console.log(`System prompt: ${options.systemPrompt || 'default'}`);
-
-			// Simulate API response
-			await new Promise(resolve => setTimeout(resolve, 1000));
-
-			// Return a mock response for now
-			return `Response to: ${query}`;
+			// Pass the current model and provider to getAIResponse
+			const response = await getAIResponse(query, messages, model, provider);
+			return response;
 		} catch (err) {
 			const errorMessage =
 				err instanceof Error ? err.message : 'Unknown error occurred';

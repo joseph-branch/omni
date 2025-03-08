@@ -6,6 +6,7 @@ import {AppProvider, useApp} from './contexts/AppContext.js';
 import {QueryProvider} from './contexts/QueryContext.js';
 import {CommandProvider} from './contexts/CommandContext.js';
 import {ModelProvider} from './contexts/ModelContext.js';
+import {MessageProvider} from './contexts/MessageContext.js';
 
 interface AppProps {
 	name?: string;
@@ -57,7 +58,9 @@ const AppContent: React.FC<AppProps> = ({name}) => {
 					<QueryProvider>
 						<CommandProvider>
 							<ModelProvider>
-								<QueryInterface onComplete={handleQueryComplete} />
+								<MessageProvider>
+									<QueryInterface onComplete={handleQueryComplete} />
+								</MessageProvider>
 							</ModelProvider>
 						</CommandProvider>
 					</QueryProvider>

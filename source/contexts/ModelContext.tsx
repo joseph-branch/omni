@@ -38,12 +38,12 @@ interface ModelProviderProps {
 
 export const ModelProvider: React.FC<ModelProviderProps> = ({children}) => {
 	const config = readConfig();
-	const [currentModel, setCurrentModelState] = useState<string>(
-		config.defaultModel,
+	const [currentModel, setCurrentModelState] = useState(config.defaultModel);
+	const [currentProvider, setCurrentProvider] = useState(
+		config.defaultProvider,
 	);
-	const [currentProvider, setCurrentProvider] = useState<string>('');
 	const [availableModels, setAvailableModels] = useState<ModelInfo[]>([]);
-	const [systemPrompt, setSystemPrompt] = useState<string>('');
+	const [systemPrompt, setSystemPrompt] = useState('');
 
 	// Initialize available models and current provider
 	useEffect(() => {
@@ -75,6 +75,12 @@ export const ModelProvider: React.FC<ModelProviderProps> = ({children}) => {
 	const setCurrentModel = (model: string) => {
 		setCurrentModelState(model);
 		setDefaultModel(model);
+
+		// Find and update the provider for this model
+		const modelInfo = availableModels.find(m => m.model === model);
+		if (modelInfo) {
+			setCurrentProvider(modelInfo.provider);
+		}
 	};
 
 	const updateSystemPrompt = (prompt: string) => {

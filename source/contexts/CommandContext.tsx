@@ -20,9 +20,18 @@ interface CommandContextType {
 
 // Define available commands for the command menu
 const AVAILABLE_COMMANDS: Command[] = [
-	{name: 'clear', description: 'Clear the conversation history'},
+	{name: 'clear', description: 'Clear the conversation history display'},
+	{
+		name: 'clear:context',
+		description: 'Clear the conversation context (memory)',
+	},
+	{
+		name: 'context',
+		description: 'Show information about the current conversation context',
+	},
 	{name: 'help', description: 'Show this help message'},
 	{name: 'model', description: 'Show current model'},
+	{name: 'model:set', description: 'Set the current model'},
 	{name: 'systemprompt', description: 'Show current system prompt'},
 	{
 		name: 'systemprompt:set',

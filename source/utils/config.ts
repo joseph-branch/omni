@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import {createOpenAI} from '@ai-sdk/openai';
+import {createAnthropic} from '@ai-sdk/anthropic';
+import {createMistral} from '@ai-sdk/mistral';
+import {createGoogleGenerativeAI} from '@ai-sdk/google';
 
 // Define the config directory and file path
 const CONFIG_DIR = path.join(os.homedir(), '.omni');
@@ -9,6 +13,7 @@ const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
 // Define the configuration interface
 export interface OmniConfig {
 	defaultModel: string;
+	defaultProvider: string;
 	providers: {
 		[key: string]: {
 			apiKey?: string;
@@ -30,17 +35,16 @@ export interface OmniConfig {
 // Default configuration
 const DEFAULT_CONFIG: OmniConfig = {
 	defaultModel: 'gpt-4o',
+	defaultProvider: 'openai',
 	providers: {
 		openai: {
 			apiKey: '',
 			models: [
-				'gpt-4',
 				'gpt-4o',
 				'gpt-4o-mini',
 				'gpt-4.5',
 				'o1',
 				'o1-mini',
-				'o3',
 				'o3-mini',
 				'o3-mini-high',
 			],
@@ -48,26 +52,41 @@ const DEFAULT_CONFIG: OmniConfig = {
 			defaultSystemPrompt: 'You are a helpful assistant.',
 			modelSystemPrompts: {
 				'gpt-4o': 'You are a helpful assistant powered by GPT-4o.',
+				'gpt-4o-mini': 'You are a helpful assistant powered by GPT-4o-mini.',
+				'gpt-4.5': 'You are a helpful assistant powered by GPT-4.5.',
 				o1: "You are a helpful assistant powered by o1, OpenAI's most advanced model.",
+				'o1-mini':
+					"You are a helpful assistant powered by o1-mini, OpenAI's most advanced model.",
+				'o3-mini':
+					"You are a helpful assistant powered by o3-mini, OpenAI's most advanced model.",
+				'o3-mini-high':
+					"You are a helpful assistant powered by o3-mini-high, OpenAI's most advanced model.",
 			},
 		},
 		anthropic: {
 			apiKey: '',
 			models: [
-				'claude-v3-haiku',
-				'claude-v3-sonnet',
-				'claude-v3-opus',
-				'claude-v3.5-sonnet',
-				'claude-v3.5-haiku',
-				'claude-v3.7-sonnet',
+				'claude-3-5-sonnet-latest',
+				'claude-3-5-haiku-latest',
+				'claude-3-sonnet-20240229',
+				'claude-3-haiku-20240307',
+				'claude-3-7-sonnet-latest',
 			],
 			enabled: false,
 			defaultSystemPrompt: 'You are Claude, a helpful AI assistant.',
 			modelSystemPrompts: {
 				'claude-v3-opus':
-					"You are Claude Opus, Anthropic's most capable model.",
+					'You are Claude Opus, a helpful and harmless AI assistant.',
 				'claude-v3.7-sonnet':
-					'You are Claude 3.7 Sonnet, a helpful and harmless AI assistant.',
+					"You are Claude 3.7 Sonnet, Anthropic's most capable model.",
+				'claude-v3.5-sonnet':
+					"You are Claude 3.5 Sonnet, Anthropic's most capable model.",
+				'claude-v3.5-haiku':
+					"You are Claude 3.5 Haiku, Anthropic's most capable model.",
+				'claude-v3-haiku':
+					"You are Claude 3 Haiku, Anthropic's most capable model.",
+				'claude-v3-sonnet':
+					"You are Claude 3 Sonnet, Anthropic's most capable model.",
 			},
 		},
 		mistral: {
@@ -78,6 +97,19 @@ const DEFAULT_CONFIG: OmniConfig = {
 			modelSystemPrompts: {
 				'mistral-large':
 					'You are Mistral Large, the most powerful model from Mistral AI.',
+			},
+		},
+		gemini: {
+			apiKey: '',
+			models: ['gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash'],
+			enabled: false,
+			defaultSystemPrompt: 'You are a helpful AI assistant by Google.',
+			modelSystemPrompts: {
+				'gemini-1.5-pro':
+					"You are Gemini 1.5 Pro, Google's most advanced model.",
+				'gemini-2.0-flash':
+					"You are Gemini 2.0 Flash, Google's most advanced model.",
+				'gemini-1.5-flash': "You are Gemini 1.5 Flash, Google's fastest model.",
 			},
 		},
 	},
@@ -153,6 +185,22 @@ export function updateProviderApiKey(provider: string, apiKey: string): void {
 export function setDefaultModel(model: string): void {
 	const config = readConfig();
 	config.defaultModel = model;
+
+	// Find the provider for this model
+	let provider = '';
+	for (const [providerName, providerConfig] of Object.entries(
+		config.providers,
+	)) {
+		if (providerConfig.models?.includes(model)) {
+			provider = providerName;
+			break;
+		}
+	}
+
+	if (provider) {
+		config.defaultProvider = provider;
+	}
+
 	updateConfig(config);
 }
 
@@ -350,3 +398,97 @@ export function updateProviderDefaultSystemPrompt(
 	// Save the updated config
 	updateConfig(config);
 }
+
+const config = readConfig();
+
+export const getModel = () => {
+	const defaultModel = config.defaultModel;
+	const provider = config.defaultProvider;
+
+	const providerConfig = config.providers[provider];
+	if (!providerConfig) {
+		throw new Error(`Provider ${provider} not found`);
+	}
+
+	// Get the appropriate model based on provider
+	let model;
+	switch (provider) {
+		case 'openai':
+			model =
+				models.openai.models[defaultModel as keyof typeof models.openai.models];
+			break;
+		case 'anthropic':
+			model =
+				models.anthropic.models[
+					defaultModel as keyof typeof models.anthropic.models
+				];
+			break;
+		case 'mistral':
+			model =
+				models.mistral.models[
+					defaultModel as keyof typeof models.mistral.models
+				];
+			break;
+		case 'gemini':
+			model =
+				models.gemini.models[defaultModel as keyof typeof models.gemini.models];
+			break;
+		default:
+			throw new Error(`Unsupported provider: ${provider}`);
+	}
+
+	if (!model) {
+		throw new Error(`Model ${defaultModel} not found for provider ${provider}`);
+	}
+
+	return model;
+};
+
+const openai = createOpenAI({
+	apiKey: readConfig().providers['openai']?.apiKey,
+});
+
+const anthropic = createAnthropic({
+	apiKey: readConfig().providers['anthropic']?.apiKey,
+});
+
+const mistral = createMistral({
+	apiKey: readConfig().providers['mistral']?.apiKey,
+});
+
+const google = createGoogleGenerativeAI({
+	apiKey: readConfig().providers['gemini']?.apiKey,
+});
+
+export const models = {
+	openai: {
+		models: {
+			'gpt-4o': openai('gpt-4o'),
+			'gpt-4o-mini': openai('gpt-4o-mini'),
+			'gpt-4.5': openai('gpt-4.5'),
+		},
+	},
+	anthropic: {
+		models: {
+			'claude-3-5-sonnet-latest': anthropic('claude-3-5-sonnet-latest'),
+			'claude-3-5-haiku-latest': anthropic('claude-3-5-haiku-latest'),
+			'claude-3-sonnet-20240229': anthropic('claude-3-sonnet-20240229'),
+			'claude-3-haiku-20240307': anthropic('claude-3-haiku-20240307'),
+			'claude-3-7-sonnet-latest': anthropic('claude-3-7-sonnet-latest'),
+		},
+	},
+	mistral: {
+		models: {
+			'mistral-small': mistral('mistral-small'),
+			'mistral-medium': mistral('mistral-medium'),
+			'mistral-large': mistral('mistral-large'),
+		},
+	},
+	gemini: {
+		models: {
+			'gemini-1.5-pro': google('gemini-1.5-pro'),
+			'gemini-2.0-flash': google('gemini-2.0-flash'),
+			'gemini-1.5-flash': google('gemini-1.5-flash'),
+		},
+	},
+};

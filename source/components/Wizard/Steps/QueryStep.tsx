@@ -6,6 +6,7 @@ import {useWizard} from '@/hooks/useWizard.js';
 import {useQuery} from '@/contexts/QueryContext.js';
 import {useCommand} from '@/contexts/CommandContext.js';
 import {useModel} from '@/contexts/ModelContext.js';
+import {useMessages} from '@/contexts/MessageContext.js';
 import {useApi} from '@/hooks/useApi.js';
 import {useKeyboardShortcuts} from '@/hooks/useKeyboardShortcuts.js';
 
@@ -40,10 +41,22 @@ const QueryStep: React.FC = () => {
 		systemPrompt,
 		updateSystemPrompt,
 		updateDefaultSystemPrompt,
+		availableModels,
+		setCurrentModel,
+		refreshModels,
 	} = useModel();
+
+	// Use message context
+	const {messages, addMessage, clearMessages, getRecentMessages} =
+		useMessages();
 
 	// Use API hook
 	const {sendQuery} = useApi();
+
+	// Refresh models list on mount
+	useEffect(() => {
+		refreshModels();
+	}, []);
 
 	// Focus the input on mount and log the prompt
 	useEffect(() => {
@@ -117,6 +130,34 @@ const QueryStep: React.FC = () => {
 		switch (commandName) {
 			case 'clear':
 				clearHistory();
+				addToHistory({
+					query: '/clear',
+					response: 'Conversation history display cleared.',
+				});
+				break;
+			case 'clear:context':
+				clearMessages();
+				addToHistory({
+					query: '/clear:context',
+					response:
+						'Conversation context (memory) cleared. The AI will no longer remember previous messages.',
+				});
+				break;
+			case 'context':
+				const contextSize = messages.length;
+				const userMessages = messages.filter(m => m.role === 'user').length;
+				const assistantMessages = messages.filter(
+					m => m.role === 'assistant',
+				).length;
+
+				addToHistory({
+					query: '/context',
+					response: `Conversation context information:
+- Total messages: ${contextSize}
+- User messages: ${userMessages}
+- Assistant messages: ${assistantMessages}
+- Messages used for context: ${Math.min(contextSize, 10)} (last 10 messages)`,
+				});
 				break;
 			case 'help':
 				addToHistory({
@@ -129,9 +170,33 @@ const QueryStep: React.FC = () => {
 				});
 				break;
 			case 'model':
+				// Show current model and list all available models
+				const availableModelsList = availableModels
+					.map(
+						m =>
+							`${m.provider}:${m.model}${
+								m.model === currentModel ? ' (current)' : ''
+							}`,
+					)
+					.join('\n');
+
 				addToHistory({
 					query: '/model',
-					response: `Current model: ${currentProvider}:${currentModel}`,
+					response: `Current model: ${currentProvider}:${currentModel}\n\nAvailable models:\n${availableModelsList}`,
+				});
+				break;
+			case 'model:set':
+				// Show available models
+				refreshModels();
+				const modelList = availableModels
+					.map(m => `${m.provider}:${m.model}`)
+					.join('\n');
+				addToHistory({
+					query: '/model:set',
+					response:
+						'Available models:\n' +
+						modelList +
+						'\n\nTo set a model, use: /model:set <provider:model> or /model:set <model>',
 				});
 				break;
 			case 'systemprompt':
@@ -188,6 +253,47 @@ const QueryStep: React.FC = () => {
 					query: query,
 					response: `Default system prompt updated for provider ${currentProvider}`,
 				});
+			} else if (commandName === 'model:set' && args.length > 0) {
+				const modelArg = args.join(' ');
+
+				// Check if the format is provider:model
+				if (modelArg.includes(':')) {
+					const [providerName, modelName] = modelArg.split(':');
+					// Find the model in availableModels
+
+					const modelInfo = availableModels.find(
+						m => m.provider === providerName && m.model === modelName,
+					);
+
+					if (modelInfo) {
+						setCurrentModel(modelInfo.model);
+						addToHistory({
+							query: query,
+							response: `Model switched to ${providerName}:${modelName}`,
+						});
+					} else {
+						addToHistory({
+							query: query,
+							response: `Model ${providerName}:${modelName} not found`,
+						});
+					}
+				} else {
+					// Just model name provided, find the first matching model
+					const modelInfo = availableModels.find(m => m.model === modelArg);
+
+					if (modelInfo) {
+						setCurrentModel(modelInfo.model);
+						addToHistory({
+							query: query,
+							response: `Model switched to ${modelInfo.provider}:${modelInfo.model}`,
+						});
+					} else {
+						addToHistory({
+							query: query,
+							response: `Model ${modelArg} not found`,
+						});
+					}
+				}
 			} else if (commandName) {
 				// Execute regular command only if commandName is defined
 				executeCommand(commandName);
@@ -215,13 +321,16 @@ const QueryStep: React.FC = () => {
 		setIsLoading(true);
 
 		try {
-			// Send query to API
-			const response = await sendQuery(query, {
-				model: currentModel,
-				systemPrompt,
-			});
+			// Add user message to context
+			addMessage({role: 'user', content: query});
 
-			// Add to history
+			// Send query to API using messages from context
+			const response = await sendQuery(query, getRecentMessages());
+
+			// Add assistant response to context
+			addMessage({role: 'assistant', content: response});
+
+			// Add to history (for UI display)
 			addToHistory({
 				query,
 				response,
@@ -233,6 +342,10 @@ const QueryStep: React.FC = () => {
 					? err.message
 					: 'An error occurred while processing your request';
 
+			// Add error message to context
+			addMessage({role: 'assistant', content: errorMessage});
+
+			// Add to history
 			addToHistory({
 				query,
 				response: errorMessage,
@@ -258,7 +371,7 @@ const QueryStep: React.FC = () => {
 			<Box borderStyle="round" borderColor="blue" paddingX={0} marginX={0}>
 				<Box flexDirection="column" paddingX={0} marginX={0}>
 					<Box>
-						<Box width={21}>
+						<Box>
 							<Text>{`${currentProvider}:${currentModel} > `}</Text>
 						</Box>
 						<TextInput
@@ -274,30 +387,21 @@ const QueryStep: React.FC = () => {
 							<Text>Loading...</Text>
 						</Box>
 					)}
-
-					{/* Command menu */}
-					{showCommandMenu && (
-						<Box
-							flexDirection="column"
-							marginLeft={2}
-							marginTop={1}
-							borderStyle="round"
-							paddingX={1}
-							paddingY={1}
-						>
-							{filteredCommands.map((command, index) => (
-								<Box key={command.name}>
-									<Text
-										color={index === selectedCommandIndex ? 'blue' : undefined}
-									>
-										{command.name} - {command.description}
-									</Text>
-								</Box>
-							))}
-						</Box>
-					)}
 				</Box>
 			</Box>
+
+			{/* Command menu */}
+			{showCommandMenu && (
+				<>
+					{filteredCommands.map((command, index) => (
+						<Box key={command.name}>
+							<Text color={index === selectedCommandIndex ? 'blue' : undefined}>
+								/{command.name} - {command.description}
+							</Text>
+						</Box>
+					))}
+				</>
+			)}
 		</Box>
 	);
 };

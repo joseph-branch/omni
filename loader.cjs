@@ -1,10 +1,6 @@
 import {resolve as resolveTs} from 'ts-node/esm';
 import * as tsConfigPaths from 'tsconfig-paths';
 import {pathToFileURL} from 'url';
-import {dirname} from 'path';
-import {fileURLToPath} from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Setup tsconfig-paths
 const {absoluteBaseUrl, paths} = tsConfigPaths.loadConfig();
